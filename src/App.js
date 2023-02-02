@@ -1,23 +1,40 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import axios from 'axios';
+import Userdata from './Components/UsersData/Userdata';
 
-function App() {
+const App =()=> {
+  const[posts,setPosts] = useState([])
+  const[loading,setLoading] = useState(false)
+  const[currentPage,setCurrentPage] = useState(1)
+  const[postsPerPage] = useState(3)
+  const[clicked,setClicked]= useState(null)
+
+  const API = "https://jsonplaceholder.typicode.com/users"
+
+  const fetchApiData = async ()=>{
+    setLoading(true)
+    axios.get(API)
+    .then((res)=>{
+      setPosts(res.data)
+    setLoading(false)
+    })
+    
+  }
+ useEffect(()=>{
+   fetchApiData();
+ },[]);
+
+
+ const indexOfLastPost = currentPage * postsPerPage;
+ const indexOfFirstPost = indexOfLastPost - postsPerPage;
+ const currentPosts = posts.slice(indexOfFirstPost,indexOfLastPost);
+const totalPages = Math.ceil(posts.length/postsPerPage)
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+       <Userdata posts={currentPosts} loading={loading} clicked={clicked} setClicked={setClicked} postsPerPage={postsPerPage} pages={totalPages} totalPosts={posts.length}  setCurrentPage={setCurrentPage}  />
+       
     </div>
   );
 }
